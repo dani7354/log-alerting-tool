@@ -1,0 +1,13 @@
+{
+  "rules_file": "/path/to/rules.json",
+  "messages_file": "/path/to/matches.csv",
+  "email_settings":
+   {
+    "smtp_host": "",
+    "smtp_port": "",
+    "smtp_user": "",
+    "smtp_password": "",
+    "mail_sender": "",
+    "mail_recipient": ""
+  }
+}

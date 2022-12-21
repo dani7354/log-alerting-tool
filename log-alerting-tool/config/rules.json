@@ -1,0 +1,17 @@
+{
+  "rules":
+  [
+    {
+      "name": "Rule name",
+      "description": "A short description",
+      "files": [
+        "/path/to/file0.log",
+        "/path/to/file1.log"
+      ],
+      "regular_expressions": [
+        "regex0",
+        "regex1"
+      ]
+    }
+  ]
+}

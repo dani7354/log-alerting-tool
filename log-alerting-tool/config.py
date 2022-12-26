@@ -10,9 +10,10 @@ class EmailConfiguration:
         self.mail_recipient = mail_recipient
 
 class Rule:
-    def __init__(self, name, description, files, regular_expressions):
+    def __init__(self, name, description, send_notification, files, regular_expressions):
         self.name = name
         self.description = description
+        self.send_notification = send_notification
         self.files = files
         self.regular_expressions = regular_expressions
 
@@ -30,7 +31,7 @@ class ConfigLoader:
     @classmethod
     def load_rules(cls, file) -> RulesConfiguration:
         rules_config_dict = cls.load_from_json(file)
-        rules = [Rule(r["name"], r["description"], r["files"], r["regular_expressions"])
+        rules = [Rule(r["name"], r["description"], r["send_notification"], r["files"], r["regular_expressions"])
                  for r in rules_config_dict["rules"]]
 
         return RulesConfiguration(rules)

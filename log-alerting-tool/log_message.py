@@ -1,10 +1,11 @@
 from hashlib import sha256
 
 class LogMessage:
-    def __init__(self, id, type_name, message, date_created):
+    def __init__(self, id, type_name, message, date_created, send_notification):
         self.type_name = type_name
         self.message = message
         self.date_created = date_created
+        self.send_notification = send_notification
         self.id = id if id is not None else self._generate_id()
 
     def __eq__(self, other):

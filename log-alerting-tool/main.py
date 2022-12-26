@@ -2,6 +2,7 @@
 import argparse
 import config
 import datetime
+import email_notifications
 import log_message
 import os
 import re
@@ -25,12 +26,12 @@ def line_is_match(line, regular_expressions) -> bool:
 
     return False
 
-def get_messages_in_file(file, type_name, regular_expressions) -> list:
+def get_messages_in_file(file, rule, regular_expressions) -> list:
     matches = []
     with open(file, "r") as log_file:
         for line in log_file:
             if line_is_match(line, regular_expressions):
-                matches.append(log_message.LogMessage(None, type_name, line.rstrip(), datetime.datetime.now()))
+                matches.append(log_message.LogMessage(None, rule.name, line.rstrip(), datetime.datetime.now(), rule.send_notification))
 
     return matches
 
@@ -39,7 +40,7 @@ def check_for_new_messages(rules_config) -> list:
     for rule in rules_config.rules:
         regular_expressions = create_regex_patterns(rule.regular_expressions)
         for file in rule.files:
-            matches_from_file = get_messages_in_file(file, rule.name, regular_expressions)
+            matches_from_file = get_messages_in_file(file, rule, regular_expressions)
             matches.extend(matches_from_file)
 
     return matches
@@ -54,7 +55,6 @@ def exclude_existing_messages(matches_file, new_matches) -> dict:
         for line in existing_matches_file:
             line_split = line.split(CSV_COLUMN_DELIMITER)
             message_id = line_split[id_csv_index]
-            print(message_id)
             if message_id in new_matches_by_id:
                 del new_matches_by_id[message_id]
 
@@ -75,6 +75,15 @@ def write_to_file(file, messages) -> None:
                               f"{CSV_COLUMN_DELIMITER}{m.message}"
                               f"{CSV_COLUMN_DELIMITER}{m.date_created}\n")
 
+def send_notifications(email_configuration, messages):
+    included_messages = []
+    for m in messages:
+        if m.send_notification:
+            included_messages.append(m)
+
+    email_service = email_notifications.EmailService(email_configuration)
+    email_service.send_email_notification(included_messages)
+
 def run():
     args = parse_arguments()
 
@@ -88,6 +97,11 @@ def run():
     print(f"filtering old messages that are already found")
     filtered_messages_by_id = exclude_existing_messages(configuration.messages_file, new_messages)
     new_messages = [msg for _, msg in  filtered_messages_by_id.items()]
+    print(f"{len(new_messages)} new messages found!")
+
+    print("Sending email notifications...")
+    send_notifications(configuration.email_configuration, new_messages)
+    print("Notification sent!")
 
     print(f"Writing {len(new_messages)} messages to file {configuration.messages_file}...")
     write_to_file(configuration.messages_file, new_messages)

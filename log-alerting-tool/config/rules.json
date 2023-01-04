@@ -4,6 +4,7 @@
     {
       "name": "Rule name",
       "description": "A short description",
+      "send_notification": true,
       "files": [
         "/path/to/file0.log",
         "/path/to/file1.log"

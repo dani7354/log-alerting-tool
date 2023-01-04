@@ -2,6 +2,7 @@
 *.log
 *.csv
 *.pyc
+*.swp
 .DS_Store
 
 test/

@@ -12,7 +12,7 @@ HTML_TABLES_DIV_ID = "messages"
 HTML_HEADING_ID = "heading"
 HTML_TABLE = "table"
 HTML_MESSAGE_HEADING = "h1"
-HTML_TABLE_HEADING = "h3"
+HTML_TABLE_HEADING = "h2"
 HTML_TR = "tr"
 HTML_TD = "td"
 
@@ -73,8 +73,8 @@ class EmailService:
         message_td.string = message.message
 
         tr_tag.append(date_td)
-        tr_tag.append(id_td)
         tr_tag.append(message_td)
+        tr_tag.append(id_td)
 
         return tr_tag
 
@@ -111,7 +111,7 @@ class EmailService:
 
     @staticmethod
     def _create_heading_for_table(soup, type_name) -> Tag:
-        heading_h3 = soup.new_tag(HTML_TABLE_HEADING)
-        heading_h3.string = type_name
+        heading = soup.new_tag(HTML_TABLE_HEADING)
+        heading.string = type_name
 
-        return heading_h3
+        return heading

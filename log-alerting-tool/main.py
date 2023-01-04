@@ -6,7 +6,6 @@ import email_notifications
 import log_message
 import os
 import re
-import sys
 
 CSV_COLUMN_DELIMITER = ";"
 
@@ -81,8 +80,14 @@ def send_notifications(email_configuration, messages):
         if m.send_notification:
             included_messages.append(m)
 
+    if len(included_messages) < 1:
+        print("No email notification to send!")
+        return
+
+    print("Sending email notifications...")
     email_service = email_notifications.EmailService(email_configuration)
     email_service.send_email_notification(included_messages)
+    print("Email notification sent!")
 
 def run():
     args = parse_arguments()
@@ -99,9 +104,7 @@ def run():
     new_messages = [msg for _, msg in  filtered_messages_by_id.items()]
     print(f"{len(new_messages)} new messages found!")
 
-    print("Sending email notifications...")
     send_notifications(configuration.email_configuration, new_messages)
-    print("Notification sent!")
 
     print(f"Writing {len(new_messages)} messages to file {configuration.messages_file}...")
     write_to_file(configuration.messages_file, new_messages)
@@ -109,8 +112,4 @@ def run():
 
 
 if __name__ == '__main__':
-    try:
-        run()
-    except Exception as ex:
-        print(ex)
-        sys.exit(1)
+    run()

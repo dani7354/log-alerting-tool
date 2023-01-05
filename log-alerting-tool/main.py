@@ -59,7 +59,7 @@ def exclude_existing_messages(matches_file, new_matches) -> dict:
 
     return new_matches_by_id
 
-def write_to_file(file, messages) -> None:
+def write_to_file(file, messages):
     if not os.path.isfile(file):
         with open(file, "w") as output_file:
             output_file.write(f"id"

@@ -57,14 +57,11 @@ class EmailService:
     def _insert_heading(soup):
         hostname = socket.gethostname()
         heading_tag = soup.select_one(f"#{HTML_HEADING_ID}")
-        heading_tag.string = f"Nye log-beskeder {hostname}"
+        heading_tag.string = f"Nye log-beskeder fra {hostname}"
 
     @staticmethod
     def _create_table_row(soup, message) -> Tag:
         tr_tag = soup.new_tag(HTML_TR)
-
-        id_td = soup.new_tag(HTML_TD)
-        id_td.string = message.id
 
         date_td = soup.new_tag(HTML_TD)
         date_td.string = str(message.date_created)
@@ -74,7 +71,6 @@ class EmailService:
 
         tr_tag.append(date_td)
         tr_tag.append(message_td)
-        tr_tag.append(id_td)
 
         return tr_tag
 

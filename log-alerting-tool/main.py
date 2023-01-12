@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
+from datetime import datetime
+from email_notifications import *
+from log_message import LogMessage
 import argparse
 import config
-import datetime
-import email_notifications
-import log_message
 import os
 import re
 
@@ -15,31 +15,25 @@ def parse_arguments():
 
     return parser.parse_args()
 
-def create_regex_patterns(regular_expressions) -> list:
-    return [re.compile(regex) for regex in regular_expressions]
-
-def line_is_match(line, regular_expressions) -> bool:
-    for regex in regular_expressions:
-        if regex.match(line):
-            return True
-
-    return False
-
 def get_messages_in_file(file, rule, regular_expressions) -> list:
     matches = []
     with open(file, "r") as log_file:
-        for line in log_file:
-            if line_is_match(line, regular_expressions):
-                matches.append(log_message.LogMessage(None, rule.name, line.rstrip(), datetime.datetime.now(), rule.send_notification))
+        log_file_text = log_file.read()
+        for regex in regular_expressions:
+            matches_for_regex = re.findall(regex, log_file_text)
+            for match in matches_for_regex:
+                matches.append(LogMessage(None, rule.name, format_match_str(match), datetime.now(), rule.send_notification))
 
     return matches
+
+def format_match_str(match_str) -> str:
+        return match_str.replace("\n", " ").replace(CSV_COLUMN_DELIMITER, "").strip()
 
 def check_for_new_messages(rules_config) -> list:
     matches = []
     for rule in rules_config.rules:
-        regular_expressions = create_regex_patterns(rule.regular_expressions)
         for file in rule.files:
-            matches_from_file = get_messages_in_file(file, rule, regular_expressions)
+            matches_from_file = get_messages_in_file(file, rule, rule.regular_expressions)
             matches.extend(matches_from_file)
 
     return matches
@@ -85,7 +79,7 @@ def send_notifications(email_configuration, messages):
         return
 
     print("Sending email notifications...")
-    email_service = email_notifications.EmailService(email_configuration)
+    email_service = EmailService(email_configuration)
     email_service.send_email_notification(included_messages)
     print("Email notification sent!")
 

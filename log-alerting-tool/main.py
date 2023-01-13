@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
+from config import ConfigLoader
 from datetime import datetime
-from email_notifications import *
+from email_notifications import EmailService
 from log_message import LogMessage
 import argparse
-import config
 import os
 import re
 
@@ -19,10 +19,10 @@ def get_messages_in_file(file, rule, regular_expressions) -> list:
     matches = []
     with open(file, "r") as log_file:
         log_file_text = log_file.read()
-        for regex in regular_expressions:
-            matches_for_regex = re.findall(regex, log_file_text)
-            for match in matches_for_regex:
-                matches.append(LogMessage(None, rule.name, format_match_str(match), datetime.now(), rule.send_notification))
+    for regex in regular_expressions:
+        matches_for_regex = re.findall(regex, log_file_text)
+        for match in matches_for_regex:
+            matches.append(LogMessage(None, rule.name, format_match_str(match), datetime.now(), rule.send_notification))
 
     return matches
 
@@ -87,7 +87,7 @@ def run():
     args = parse_arguments()
 
     print(f"loading configuration from {args.config}...")
-    configuration = config.ConfigLoader.load_config(args.config)
+    configuration = ConfigLoader.load_config(args.config)
 
     print(f"Checking log files for new matching messages...")
     new_messages = check_for_new_messages(configuration.rules_configuration)

@@ -17,4 +17,4 @@ class LogMessage:
         return f"Hash: {self.id} Type: {self.type_name} Message: {self.message} Date: {self.date_created}"
 
     def _generate_id(self):
-        return sha256(f"{self.type_name}{self.message}".encode("ascii")).hexdigest()
+        return sha256(f"{self.type_name}{self.message}".encode("utf-8")).hexdigest()qq

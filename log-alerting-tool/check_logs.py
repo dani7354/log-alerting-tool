@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from config import ConfigLoader
+from config import ConfigLoader, CSV_COLUMN_DELIMITER
 from datetime import datetime
 from email_notifications import EmailService
 from log_message import LogMessage
@@ -7,13 +7,13 @@ import argparse
 import os
 import re
 
-CSV_COLUMN_DELIMITER = ";"
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", dest="config", type=str, required=True)
 
     return parser.parse_args()
+
 
 def get_messages_in_file(file, rule, regular_expressions) -> list:
     matches = []
@@ -26,8 +26,10 @@ def get_messages_in_file(file, rule, regular_expressions) -> list:
 
     return matches
 
+
 def format_match_str(match_str) -> str:
-        return match_str.replace("\n", " ").replace(CSV_COLUMN_DELIMITER, "").strip()
+    return match_str.replace("\n", " ").replace(CSV_COLUMN_DELIMITER, "").strip()
+
 
 def check_for_new_messages(rules_config) -> list:
     matches = []
@@ -37,6 +39,7 @@ def check_for_new_messages(rules_config) -> list:
             matches.extend(matches_from_file)
 
     return matches
+
 
 def exclude_existing_messages(matches_file, new_matches) -> dict:
     id_csv_index = 0
@@ -53,6 +56,7 @@ def exclude_existing_messages(matches_file, new_matches) -> dict:
 
     return new_matches_by_id
 
+
 def write_to_file(file, messages):
     if not os.path.isfile(file):
         with open(file, "w") as output_file:
@@ -68,6 +72,7 @@ def write_to_file(file, messages):
                               f"{CSV_COLUMN_DELIMITER}{m.message}"
                               f"{CSV_COLUMN_DELIMITER}{m.date_created}\n")
 
+
 def send_notifications(email_configuration, messages):
     included_messages = []
     for m in messages:
@@ -82,6 +87,7 @@ def send_notifications(email_configuration, messages):
     email_service = EmailService(email_configuration)
     email_service.send_email_notification(included_messages)
     print("Email notification sent!")
+
 
 def run():
     args = parse_arguments()
